@@ -90,10 +90,3 @@ print(schedule3)
 
 schedule4 = generate_schedule(15, 3, 2)
 print(schedule4)
-
-
-
-print(schedule1)
-print(schedule2)
-print(schedule3)
-print(schedule4)
