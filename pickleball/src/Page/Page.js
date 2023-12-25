@@ -27,6 +27,10 @@ const Page = () => {
     setGamesPerPlayer(e.target.value-0)
     }
 
+    useEffect(() => {
+        console.log(schedule);
+      }, [schedule]);
+
     return (
         <div>
             <h1>Leo and Linda's new pickleball app!</h1>
@@ -58,7 +62,7 @@ const Page = () => {
 
             <div>
                 <h2>Schedule: </h2>
-                {schedule.map(games => {
+                {schedule && schedule?.map(games => {
                    return(<div>{games}</div>)
                })}
 
