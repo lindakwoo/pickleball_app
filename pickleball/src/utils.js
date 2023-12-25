@@ -1,4 +1,5 @@
-export const generateSchedule=(numPlayers, numCourts, gamesPerPlayer)=> {
+export const generateSchedule = (numPlayers, numCourts, gamesPerPlayer) => {
+  console.log(numPlayers,numCourts,gamesPerPlayer)
     if (numPlayers < 4 * numCourts) {
       return "Error: not enough players";
     }

@@ -9,22 +9,22 @@ const Page = () => {
    
     const HandleSubmit = (e) => {
         e.preventDefault();
-        const schedule = generateSchedule(numberOfPlayers, numberOfCourts, gamesPerPlayer);
-        setSchedule(schedule);
+        setSchedule(generateSchedule(numberOfPlayers, numberOfCourts, gamesPerPlayer));
+        console.log(schedule)
     }
     const handleNumberOfPlayers = (e) => {
         console.log(e.target.value)
-    setNumberOfPlayers(e.target.value)
+    setNumberOfPlayers(e.target.value-0)
     }
 
     const handleNunberOfCourts = (e) => {
         console.log(e.target.value)
-    setNumberOfCourts(e.target.value)
+    setNumberOfCourts(e.target.value-0)
     }
 
     const handleNumberOfGames = (e) => {
         console.log(e.target.value)
-    setGamesPerPlayer(e.target.value)
+    setGamesPerPlayer(e.target.value-0)
     }
 
     return (
@@ -58,6 +58,9 @@ const Page = () => {
 
             <div>
                 <h2>Schedule: </h2>
+                {schedule.map(games => {
+                   return(<div>{games}</div>)
+               })}
 
             </div>
         </div>
