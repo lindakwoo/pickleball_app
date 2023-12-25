@@ -1,10 +1,100 @@
-
-
-const create2DArray = (x) => {
-    return Array.from({ length: x }, () => Array.from({ length: x }).fill(0));
-}
-
-const generateCombinations = (arr, combinationSize) => {
+export const generateSchedule=(numPlayers, numCourts, gamesPerPlayer)=> {
+    if (numPlayers < 4 * numCourts) {
+      return "Error: not enough players";
+    }
+  
+    let players = Array.from({ length: numPlayers }, (_, index) => index);
+    players.sort(() => Math.random() - 0.5);
+  
+    let historyTracker = Array.from({ length: numPlayers }, () =>
+      Array(numPlayers).fill(0)
+    );
+    let teamHistoryTracker = Array.from({ length: numPlayers }, () =>
+      Array(numPlayers).fill(0)
+    );
+    let gamesCounter = Array(numPlayers).fill(0);
+    let schedule = [];
+  
+    function hasPlayedTogether(p1, p2) {
+      return historyTracker[p1][p2] > 0;
+    }
+  
+    function hasBeenTeammates(p1, p2) {
+      return teamHistoryTracker[p1][p2] > 0;
+    }
+  
+    function validTeams(combination) {
+      for (let team of combinations(combination, 2)) {
+        if (!hasBeenTeammates(team[0], team[1])) {
+          let remainingPlayers = new Set(combination.filter((p) => !team.includes(p)));
+          let otherTeam = Array.from(remainingPlayers);
+  
+          if (!hasBeenTeammates(otherTeam[0], otherTeam[1])) {
+            teamHistoryTracker[team[0]][team[1]] += 1;
+            teamHistoryTracker[team[1]][team[0]] += 1;
+  
+            teamHistoryTracker[otherTeam[0]][otherTeam[1]] += 1;
+            teamHistoryTracker[otherTeam[1]][otherTeam[0]] += 1;
+  
+            return [team, otherTeam];
+          }
+        }
+      }
+      return [null, null];
+    }
+  
+    let totalGames = (numPlayers * gamesPerPlayer) / 4;
+    let gamesScheduled = 0;
+  
+    console.log("num players: ", numPlayers);
+    console.log("num courts: ", numCourts);
+    console.log("total games: ", totalGames);
+  
+    while (gamesScheduled < totalGames) {
+      let validCombinations = combinations(players, 4).filter((combination) => {
+        return combination.every((p) => gamesCounter[p] < gamesPerPlayer);
+      });
+  
+      if (validCombinations.length === 0) {
+        break;
+      }
+  
+      for (let _ = 0; _ < numCourts; _++) {
+        if (gamesScheduled >= totalGames) {
+          break;
+        }
+  
+        let leastCombination = validCombinations.reduce((min, current) => {
+          let sumCurrent = current.reduce((sum, p) => sum + gamesCounter[p], 0);
+          let sumMin = min.reduce((sum, p) => sum + gamesCounter[p], 0);
+          return sumCurrent < sumMin ? current : min;
+        }, validCombinations[0]);
+  
+        let [team1, team2] = validTeams(leastCombination);
+        if (!team1 || !team2) {
+          continue;
+        }
+        schedule.push([team1, team2]);
+  
+        gamesScheduled += 1;
+  
+        for (let [p1, p2] of combinations(leastCombination, 2)) {
+          historyTracker[p1][p2] += 1;
+          historyTracker[p2][p1] += 1;
+        }
+  
+        for (let p of leastCombination) {
+          gamesCounter[p] += 1;
+        }
+      }
+    }
+    console.log(schedule)
+  
+    return schedule;
+  }
+  
+  // Helper function to generate combinations of elements
+  const combinations = (arr, combinationSize) => {
     const combinations = [];
 
     // Ensure combinationSize is valid
@@ -28,140 +118,3 @@ const generateCombinations = (arr, combinationSize) => {
 
     return combinations;
 }
-
-const createArrayFrom1ToX = (x) => {
-    const resultArray = [];
-    for (let i = 0; i < x; i++) {
-        resultArray.push(i);
-    }
-    return resultArray;
-}
-
-const shuffle = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-};
-
-export const generateSchedule = (numberOfPlayers, numberOfCourts, gamesPerPlayer) => {
-    if (numberOfPlayers < 4 * numberOfCourts) {
-        throw new Error('not enough players!!');
-
-    }
-
-    const playerList = createArrayFrom1ToX(numberOfPlayers);
-
-    const randomizedPlayers = [...playerList]
-    shuffle(randomizedPlayers);
-
-    const playHistoryTracker = create2DArray(numberOfPlayers);
-    const teammateHistoryTracker = create2DArray(numberOfPlayers);
-    let gamesCounter = Array.from({ length: numberOfPlayers }).fill(0);
-    gamesCounter = [1, 2, 2, 0, 1, 1, 0, 0, 0, 0];
-    const schedule = [];
-    const hasPlayedTogether = (p1, p2) => {
-        return playHistoryTracker[p1 - 1][p2 - 1] > 0;
-    }
-    const hasBeenTeammates = (p1, p2) => {
-        return teammateHistoryTracker[p1 - 1][p2 - 1] > 0 || teammateHistoryTracker[p2 - 1][p1 - 1] > 0;
-    }
-
-    const all4PlayerCombinations = generateCombinations(randomizedPlayers, 4);
-
-
-
-    const validTeams = (combination) => {
-        const twoTeams = generateCombinations(combination, 2);
-        let team1 = null;
-        let team2 = null;
-        twoTeams.forEach((team) => {
-            if (!hasBeenTeammates(team[0], team[1])) {
-                const otherTeam = combination.filter(player => {
-                    return player !== team[0] && player !== team[1]
-                })
-                console.log('other', otherTeam)
-
-                if (!hasBeenTeammates(otherTeam[0], otherTeam[1])) {
-
-                    teammateHistoryTracker[team[0]][team[1]] += 1;
-                    teammateHistoryTracker[team[1]][team[0]] += 1;
-
-
-                    teammateHistoryTracker[otherTeam[0]][otherTeam[1]] += 1;
-                    teammateHistoryTracker[otherTeam[1]][otherTeam[0]] += 1;
-                    console.log('two teams', team, otherTeam)
-
-                    team1 = team;
-                    team2 = otherTeam;
-
-                }
-            }
-        })
-        return { team1, team2 }
-    }
-
-    const totalGames = numberOfCourts * gamesPerPlayer
-    let gamesScheduled = 0;
-
-    const findArrayWithSmallestSum = (arrays) => {
-        // if (arrays.length === 0) {
-        //     return null; // Return null for an empty array
-        // }
-
-        let minSum = Infinity; // Initialize minSum to positive infinity
-        let minSumArray = [];
-
-        for (const array of arrays) {
-            const sum = gamesCounter[array[0]] + gamesCounter[array[1]] + gamesCounter[array[2]] + gamesCounter[array[3]]
-            if (sum < minSum) {
-                minSum = sum;
-                minSumArray = array;
-            }
-        }
-        return minSumArray;
-    }
-
-
-    for (let i = 1; i < 2;i++){
-
-    const validCombinations = all4PlayerCombinations.filter(combo => {
-        return combo.every(player => {
-            return gamesCounter[player] < gamesPerPlayer;
-        })
-    })
-
-    if (!validCombinations) {
-        return;
-    }
-    for (let i = 1; i <= numberOfCourts; i++) {
-        const leastCombination = findArrayWithSmallestSum(validCombinations)
-
-        console.log('leat', leastCombination)
-        const { team1, team2 } = validTeams(leastCombination);
-        if (team1 && team2) {
-            schedule.push([team1, team2]);
-            gamesScheduled += 1;
-            console.log('games', gamesScheduled);
-            leastCombination.forEach(player => {
-                gamesCounter[player] += 1;
-            })
-        }
-    }
-
-    }
-
-
-
-
-
-
-
-    console.log('schedule', schedule)
-}
-
-
-
-
-
