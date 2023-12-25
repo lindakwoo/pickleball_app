@@ -1,10 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { generateSchedule } from "../utils";
 
 const Page = () => {
-    generateSchedule(10, 2, 5);
+    const [numberOfPlayers, setNumberOfPlayers] = useState();
+    const [numberOfCourts, setNumberOfCourts] = useState();
+    const [gamesPerPlayer, setGamesPerPlayer] = useState();
+    const [schedule, setSchedule] = useState();
+   
     const HandleSubmit = (e) => {
         e.preventDefault();
+        const schedule = generateSchedule(numberOfPlayers, numberOfCourts, gamesPerPlayer);
+        setSchedule(schedule);
+    }
+    const handleNumberOfPlayers = (e) => {
+        console.log(e.target.value)
+    setNumberOfPlayers(e.target.value)
+    }
+
+    const handleNunberOfCourts = (e) => {
+        console.log(e.target.value)
+    setNumberOfCourts(e.target.value)
+    }
+
+    const handleNumberOfGames = (e) => {
+        console.log(e.target.value)
+    setGamesPerPlayer(e.target.value)
     }
 
     return (
@@ -14,21 +34,21 @@ const Page = () => {
                 <div>
                     <label>
                         Number of Players:
-                        <input type="number" />
+                        <input onChange = {handleNumberOfPlayers} type="number" />
                     </label>
                 </div>
 
                 <div>
                     <label>
                         Number of Courts:
-                        <input type="number" />
+                        <input type="number" onChange={handleNunberOfCourts} />
                     </label>
                 </div>
 
                 <div>
                     <label>
                         Games per Player:
-                        <input type="number" />
+                        <input type="number" onChange={handleNumberOfGames} />
                     </label>
                 </div>
 

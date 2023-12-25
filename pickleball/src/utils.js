@@ -46,10 +46,6 @@ export const generateSchedule=(numPlayers, numCourts, gamesPerPlayer)=> {
     let totalGames = (numPlayers * gamesPerPlayer) / 4;
     let gamesScheduled = 0;
   
-    console.log("num players: ", numPlayers);
-    console.log("num courts: ", numCourts);
-    console.log("total games: ", totalGames);
-  
     while (gamesScheduled < totalGames) {
       let validCombinations = combinations(players, 4).filter((combination) => {
         return combination.every((p) => gamesCounter[p] < gamesPerPlayer);
